@@ -1,0 +1,11 @@
+Model Information:
+* title:	Christmas Tree 2
+* source:	https://sketchfab.com/3d-models/christmas-tree-2-7529dc05f04847b798f2ee89bc4dd5ca
+* author:	rhcreations (https://sketchfab.com/rhcreations)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Christmas Tree 2" (https://sketchfab.com/3d-models/christmas-tree-2-7529dc05f04847b798f2ee89bc4dd5ca) by rhcreations (https://sketchfab.com/rhcreations) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
