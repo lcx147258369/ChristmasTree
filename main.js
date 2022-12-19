@@ -9,8 +9,8 @@ import {AxesHelper } from 'three/src/helpers/AxesHelper'
 const scene = new THREE.Scene();
 
 // 创建一个相机
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 100, 10000) // 75角度， 拍摄面长宽比  近裁剪面， 远裁剪面
-camera.position.set(0, 10, 200); //设置相机位置
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 10, 100) // 75角度， 拍摄面长宽比  近裁剪面， 远裁剪面
+camera.position.set(0, 0, 200); //设置相机位置
 camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
 
 
@@ -40,16 +40,14 @@ var spotLight = new THREE.SpotLight(0xFFFF00, 1, 100);
 spotLight.position.set(1, 1, 10);
 spotLight.isSpotLightShadow = true
 spotLight.castShadow = true
-spotLight.shadow.mapSize.width = 512;  // default
-spotLight.shadow.mapSize.height = 512; // default
-spotLight.shadow.camera.near = 0.5;    // default
-spotLight.shadow.camera.far = 500      // default
-spotLight.shadow.focus = 1;            // default
+spotLight.shadow.camera.near = 1;    // default
+spotLight.shadow.camera.far = 1000      // default
+camera.updateProjectionMatrix()
 scene.add(spotLight);
 
 
 // 环境光
-let ambientlight = new THREE.AmbientLight(0xFFFFFF, 1); // soft white light
+let ambientlight = new THREE.AmbientLight(0xFFFFFF, 0.5); // soft white light
 scene.add(ambientlight);
 
 
@@ -58,6 +56,8 @@ scene.add(ambientlight);
 let directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
 directionalLight.position.set(100, 20, 20);
 directionalLight.castShadow = true
+directionalLight.shadow.radius = 1000;
+directionalLight.shadow.mapSize.set(4096, 4096)
 scene.add(directionalLight);
 
 
@@ -72,7 +72,7 @@ loader.load('scene.gltf', function (gltf) {
   gltf.scene.scale.set(2, 2, 2)
   gltf.scene.position.set(0, 1, 0)
   gltf.scene.castShadow = true
-  scene.add(gltf.scene);
+  // scene.add(gltf.scene);
 }, undefined, function (error) {
   console.error(error);
 });
@@ -103,8 +103,8 @@ const rgbeloader = new RGBELoader();
    
       //球形环境贴图
      let material = new THREE.MeshStandardMaterial({
-      transparent: true,
-      opacity: 0.2
+      // transparent: true,
+      // opacity: 0.2
      });
      let squer = new THREE.SphereGeometry( 20, 100, 100 )
      var Sphere = new THREE.Mesh(squer,material);
