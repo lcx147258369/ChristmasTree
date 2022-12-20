@@ -21,13 +21,35 @@ const scene = new THREE.Scene();
 //   scene.background = texture
  
 // });
- let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-fox-750843.jpg')
+ let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-dzenina-lukac-754263.jpg', (texture) => {
 
-//  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+  // texture.image.width = 1000;
+  // texture.image.height = 1000;
+  // scene.background = texture;
+  // camera.updateProjectionMatrix()
+  // return texture
+ });
 
-scene.background = backgroudTexture
+ const canvasAspect = window.innerWidth / window.innerHeight
 
-// const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+ console.log(window.clientWidth, 'canvas')
+
+ const imageAspect = backgroudTexture.image ? backgroudTexture.image.width / backgroudTexture.image.height : 1;
+ 
+ const aspect = imageAspect / canvasAspect;
+ 
+ backgroudTexture.offset.x = aspect > 1 ? (1 - 1 / aspect)/2 : 0;
+ 
+ backgroudTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
+ 
+ backgroudTexture.offset.y = aspect > 1 ? 0 : (1 - aspect)/2;
+ 
+ backgroudTexture.repeat.y = aspect > 1 ? 1 : aspect/2;
+
+
+ scene.background = backgroudTexture;
+
+
 
 
 
