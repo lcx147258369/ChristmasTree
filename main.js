@@ -7,9 +7,34 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import {AxesHelper } from 'three/src/helpers/AxesHelper'
 // 创建一个场景
 const scene = new THREE.Scene();
+// scene.background = 
+
+// let imageBackground = new THREE.ImageLoader().load('/public/texture/background/pexels-fox-750843.jpg', (image) => {
+//   // const canvas = document.createElement( 'canvas' );
+//   // canvas.width = 375
+//   // canvas.height = 750
+//   // const context = canvas.getContext( '2d' );
+//   // context.drawImage( image, 0, 0);
+//   console.log(image, 'image')
+//   let texture = new THREE.Texture(image);
+//   console.log(texture, 'texture')
+//   scene.background = texture
+ 
+// });
+ let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-fox-750843.jpg')
+
+//  const canvasAspect = canvas.clientWidth / canvas.clientHeight;
+
+scene.background = backgroudTexture
+
+// const imageAspect = bgTexture.image ? bgTexture.image.width / bgTexture.image.height : 1;
+
+
+
+// scene.background = 
 
 // 创建一个相机
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 10, 100) // 75角度， 拍摄面长宽比  近裁剪面， 远裁剪面
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 10, 500 ) // 75角度， 拍摄面长宽比  近裁剪面， 远裁剪面
 camera.position.set(0, 0, 200); //设置相机位置
 camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
 
@@ -24,15 +49,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 let pixelRatio = renderer.getPixelRatio();
 renderer.setPixelRatio(pixelRatio)
 
-// 
-
-
-// 响应式
-// window.on('resize', () => {
-//     camera.aspect = window.innerWidth / window.innerHeight;
-//     camera.updateProjectionMatrix();
-//     renderer.setSize(window.innerWidth, window.innerHeight);
-// })
 
 
 // 聚光灯
@@ -47,7 +63,7 @@ scene.add(spotLight);
 
 
 // 环境光
-let ambientlight = new THREE.AmbientLight(0xFFFFFF, 0.5); // soft white light
+let ambientlight = new THREE.AmbientLight(0xFFFFFF, 0.7); // soft white light
 scene.add(ambientlight);
 
 
@@ -58,7 +74,7 @@ directionalLight.position.set(100, 20, 20);
 directionalLight.castShadow = true
 directionalLight.shadow.radius = 1000;
 directionalLight.shadow.mapSize.set(4096, 4096)
-scene.add(directionalLight);
+// scene.add(directionalLight);
 
 
 // 点光源
@@ -72,24 +88,11 @@ loader.load('scene.gltf', function (gltf) {
   gltf.scene.scale.set(2, 2, 2)
   gltf.scene.position.set(0, 1, 0)
   gltf.scene.castShadow = true
-  // scene.add(gltf.scene);
+  scene.add(gltf.scene);
 }, undefined, function (error) {
   console.error(error);
 });
 
-
-
-// // 创建一个立方体 BOX
-// var gemometry = new THREE.BoxGeometry(1, 1, 1)
-
-// // 材质
-// var material = new THREE.MeshBasicMaterial({ color: '#fff' })
-
-// // 网孔 承载集合模型的对象
-// var cube = new THREE.Mesh(gemometry, material);
-
-// // 添加网孔到场景
-// scene.add(cube)
 
 
 
@@ -99,12 +102,10 @@ loader.load('scene.gltf', function (gltf) {
 const rgbeloader = new RGBELoader();
  let Texture = rgbeloader.load('./public/snowy_field_4k.hdr',(texture) => {
 
-
-   
       //球形环境贴图
      let material = new THREE.MeshStandardMaterial({
-      // transparent: true,
-      // opacity: 0.2
+      transparent: true,
+      opacity: 0.2
      });
      let squer = new THREE.SphereGeometry( 20, 100, 100 )
      var Sphere = new THREE.Mesh(squer,material);
@@ -167,7 +168,7 @@ control.enableDamping = true;
 // 渲染动画
 function render() {
   control.update();
-
+  camera.updateProjectionMatrix()
   // scene.rotation.y += 0.01;
   renderer.render(scene, camera)
   requestAnimationFrame(render);
