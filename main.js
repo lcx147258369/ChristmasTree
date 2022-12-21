@@ -21,7 +21,7 @@ const scene = new THREE.Scene();
 //   scene.background = texture
  
 // });
- let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-dzenina-lukac-754263.jpg', (texture) => {
+ let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-fox-750843.jpg', (texture) => {
 
   // texture.image.width = 1000;
   // texture.image.height = 1000;
@@ -38,13 +38,13 @@ const scene = new THREE.Scene();
  
  const aspect = imageAspect / canvasAspect;
  
- backgroudTexture.offset.x = aspect > 1 ? (1 - 1 / aspect)/2 : 0;
+ backgroudTexture.offset.x = aspect > 1 ? (1 - 1 / aspect) : 0;
  
  backgroudTexture.repeat.x = aspect > 1 ? 1 / aspect : 1;
  
- backgroudTexture.offset.y = aspect > 1 ? 0 : (1 - aspect)/2;
+ backgroudTexture.offset.y = aspect > 1 ? 0 : (1 - aspect);
  
- backgroudTexture.repeat.y = aspect > 1 ? 1 : aspect/2;
+ backgroudTexture.repeat.y = aspect > 1 ? 1 : aspect;
 
 
  scene.background = backgroudTexture;
@@ -57,7 +57,7 @@ const scene = new THREE.Scene();
 
 // 创建一个相机
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 10, 500 ) // 75角度， 拍摄面长宽比  近裁剪面， 远裁剪面
-camera.position.set(0, 0, 200); //设置相机位置
+camera.position.set(0, 0, 100); //设置相机位置
 camera.lookAt(scene.position); //设置相机方向(指向的场景对象)
 
 
@@ -85,7 +85,7 @@ scene.add(spotLight);
 
 
 // 环境光
-let ambientlight = new THREE.AmbientLight(0xFFFFFF, 0.7); // soft white light
+let ambientlight = new THREE.AmbientLight(0xFFFFFF, 2); // soft white light
 scene.add(ambientlight);
 
 
@@ -96,13 +96,13 @@ directionalLight.position.set(100, 20, 20);
 directionalLight.castShadow = true
 directionalLight.shadow.radius = 1000;
 directionalLight.shadow.mapSize.set(4096, 4096)
-// scene.add(directionalLight);
+scene.add(directionalLight);
 
 
 // 点光源
 var light = new THREE.PointLight(0xFF00FF, 10, 100);
 light.position.set(50, 120, 50);
-// scene.add(light);
+scene.add(light);
 
 // 加载一个3D模型
 const loader = new GLTFLoader().setPath( 'models/tree/' );
@@ -115,7 +115,11 @@ loader.load('scene.gltf', function (gltf) {
   console.error(error);
 });
 
-
+// 加载一个六面体
+const cylinderGeometry = new THREE.CylinderGeometry( 15, 15, 10, 32 );
+const cylinderMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+const cylinder = new THREE.Mesh( cylinderGeometry, cylinderMaterial );
+scene.add( cylinder );
 
 
 
@@ -123,11 +127,14 @@ loader.load('scene.gltf', function (gltf) {
 
 const rgbeloader = new RGBELoader();
  let Texture = rgbeloader.load('./public/snowy_field_4k.hdr',(texture) => {
-
+    let squerLoader = new THREE.TextureLoader();
       //球形环境贴图
      let material = new THREE.MeshStandardMaterial({
       transparent: true,
-      opacity: 0.2
+      opacity: 0.5,
+      bumpMap: squerLoader.load('./public/texture/ball/TilesCeramicSubwayOffsetCrackle002_BUMP_2K.jpg'),
+      aoMap: squerLoader.load('./public/texture/ball/TilesCeramicSubwayOffsetCrackle002_AO_2K.jpg'),
+      lightMap: squerLoader.load('./public/texture/ball/TilesCeramicSubwayOffsetCrackle002_AO_2K.jpg'),
      });
      let squer = new THREE.SphereGeometry( 20, 100, 100 )
      var Sphere = new THREE.Mesh(squer,material);
@@ -155,7 +162,7 @@ const rgbeloader = new RGBELoader();
     PlaneMesh.rotation.x = (-Math.PI / 2)
     PlaneMesh.receiveShadow = true
 
-    scene.add(PlaneMesh);
+    // scene.add(PlaneMesh);
  })
 
 
