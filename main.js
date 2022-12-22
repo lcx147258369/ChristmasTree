@@ -142,12 +142,86 @@ Sphere.castShadow = true
 //  texture.mapping = THREE.EquirectangularReflectionMapping;
 //  scene.background = texture;
 //  scene.environment = texture;
+scene.add(Sphere)
+
+
+/**
+ * 雪花
+ */
+
 //材质对象 
-let particleMaterial = new THREE.PointsMaterial({map: textureLoader.load('./public/sprite/snow2.png')}); 
+let particleMaterial = new THREE.PointsMaterial({map: textureLoader.load('./public/sprite/snow2.png'), size: 5}); 
+let pointGemotry = new THREE.BufferGeometry();
+
+let range = 400; // 雪花出现范围
+let vertices = []
+for(let i=0; i< 800;i++) {
+  
+  let v = new THREE.Vector3(
+    Math.random() * range - range / 2,
+    Math.random() * range - range / 2,
+    Math.random() * range - range / 2
+  )
+  v.velocity = createVelocity();
+  vertices.push(v);
+}
+
+pointGemotry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices), 3 ) );
+
+
 //点模型对象
-let particlePoints = new THREE.Points(squer, particleMaterial); 
+let particlePoints = new THREE.Points(pointGemotry, particleMaterial); 
 //添加到场景中
 scene.add(particlePoints);
+// renderer.render()
+// animate();
+
+
+// 创建指定该范围内的随机数
+function randomRange(t, i) {
+  return Math.random() * (i-t) + t
+}
+
+
+// 创建运动方向
+function createVelocity () {
+  let velocity = new THREE.Vector3(0, -0.4, 0);
+  var TO_RADIANS = Math.PI / 180;
+  THREE.Vector3.prototype.rotateX = function (t) {
+      var cosRY = Math.cos(t * TO_RADIANS);
+      var sinRY = Math.sin(t * TO_RADIANS);
+      var i = this.z,
+          o = this.y;
+      this.y = o * cosRY + i * sinRY;
+      this.z = o * -sinRY + i * cosRY
+  }
+
+  velocity.rotateX(randomRange(-45, 45))
+  velocity.rotateX(randomRange(0, 360))
+  return velocity
+}
+
+// 动画
+function animate() {
+  let vertices = points.geometry.vertices;
+  vertices.forEach(function (v, idx) {
+    
+      // 计算位置
+      v.y = v.y + (v.velocity.y);
+      v.x = v.x + (v.velocity.x);
+      v.z = v.z + (v.velocity.z);
+
+      // 边界检查
+      if (v.y <= -range / 2) v.y = range / 2;
+      if (v.x <= -range / 2 || v.x >= range / 2) v.x = v.x * -1;
+      if (v.z <= -range / 2 || v.z >= range / 2) v.velocity.z = v.velocity.z * -1;
+  });
+
+  //重要：渲染时需要更新位置（如果没有设为true,则无法显示动画）
+  points.geometry.verticesNeedUpdate = true;
+  renderer.render(scene, camera);
+  requestAnimationFrame(animate);
+};
 
 
 
@@ -177,26 +251,6 @@ const rgbeloader = new RGBELoader();
 
 
 
-//移动下相机的位置
-// camera.position.z = 0;
-
-
-
-
-// 添加一个线条 
-const materialLine = new THREE.LineBasicMaterial({ color: '#fff' });
-
-// 添加点
-const points = [
-  new THREE.Vector3(0, 0, 0),
-  new THREE.Vector3(0, 10, 0),
-  new THREE.Vector3(20, 10, 0)
-];
-
-const geometryLine = new THREE.BufferGeometry().setFromPoints(points)
-
-
-const line = new THREE.Line(geometryLine, materialLine);
 
 //  控制器
 const control = new OrbitControls(camera, renderer.domElement)
@@ -209,7 +263,6 @@ control.enableDamping = true;
 function render() {
   control.update();
   camera.updateProjectionMatrix()
-  // scene.rotation.y += 0.01;
   renderer.render(scene, camera)
   requestAnimationFrame(render);
 }
