@@ -8,21 +8,7 @@ import {AxesHelper } from 'three/src/helpers/AxesHelper'
 // import snow from './public/sprite/snow';
 // 创建一个场景
 const scene = new THREE.Scene();
-// scene.background = 
-
-// let imageBackground = new THREE.ImageLoader().load('/public/texture/background/pexels-fox-750843.jpg', (image) => {
-//   // const canvas = document.createElement( 'canvas' );
-//   // canvas.width = 375
-//   // canvas.height = 750
-//   // const context = canvas.getContext( '2d' );
-//   // context.drawImage( image, 0, 0);
-//   console.log(image, 'image')
-//   let texture = new THREE.Texture(image);
-//   console.log(texture, 'texture')
-//   scene.background = texture
- 
-// });
- let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/pexels-dzenina-lukac-754263.jpg', (texture) => {
+ let backgroudTexture = new THREE.TextureLoader().load('/public/texture/background/chirsmas_bg2.jpg', (texture) => {
 
   // texture.image.width = 1000;
   // texture.image.height = 1000;
@@ -117,7 +103,7 @@ loader.load('scene.gltf', function (gltf) {
 
 // 加载一个六面体 底座
 const textureLoader = new THREE.TextureLoader();
-const cylinderGeometry = new THREE.CylinderGeometry( 18, 18, 15, 6, 100);
+const cylinderGeometry = new THREE.CylinderGeometry( 18, 18, 15, 8, 100);
 const cylinderMaterial = new THREE.MeshStandardMaterial({
       map: textureLoader.load('/public/texture/ball/Wood026_2K_Color.jpg'),
       // displacementMap: textureLoader.load('./public/texture/ball/Wood026_2K_Displacement.jpg'),
@@ -149,79 +135,42 @@ scene.add(Sphere)
  * 雪花
  */
 
-//材质对象 
-let particleMaterial = new THREE.PointsMaterial({map: textureLoader.load('./public/sprite/snow2.png'), size: 5}); 
-let pointGemotry = new THREE.BufferGeometry();
-
-let range = 400; // 雪花出现范围
-let vertices = []
-for(let i=0; i< 800;i++) {
-  
-  let v = new THREE.Vector3(
-    Math.random() * range - range / 2,
-    Math.random() * range - range / 2,
-    Math.random() * range - range / 2
-  )
-  v.velocity = createVelocity();
-  vertices.push(v);
-}
-
-pointGemotry.setAttribute( 'position', new THREE.BufferAttribute( new Float32Array(vertices), 3 ) );
+//1、创造粒子缓冲区几何体
+const particlesGeometry = new THREE.BufferGeometry();
+const count = 10000;
 
 
-//点模型对象
-let particlePoints = new THREE.Points(pointGemotry, particleMaterial); 
-//添加到场景中
-scene.add(particlePoints);
-// renderer.render()
-// animate();
 
+//3、随机生成顶点的位置并给粒子缓冲区几何体传值
+//Math.random()生成0到小于1的值，生成-100到100的点
+const vertices = []
+  for (let i = 0; i < 10000; i++) {
+      const x = Math.random() * 2000 - 1000
+      const y = Math.random() * 2000 - 1000
+      const z = Math.random() * 2000 - 1000
+      vertices.push(x, y, z)
+  }
 
-// 创建指定该范围内的随机数
-function randomRange(t, i) {
-  return Math.random() * (i-t) + t
-}
+particlesGeometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
 
+//4、设置点的纹理材质（雪花贴图）
+const pointsMaterial = new THREE.PointsMaterial({size: 1,
+  blending: THREE.AdditiveBlending,
+  depthTest: false,
+  transparent: true
+});
+  pointsMaterial.color.setHSL(0.9, 0.05, 0.5)
+    // 载入纹理
 
-// 创建运动方向
-function createVelocity () {
-  let velocity = new THREE.Vector3(0, -0.4, 0);
-  var TO_RADIANS = Math.PI / 180;
-  THREE.Vector3.prototype.rotateX = function (t) {
-      var cosRY = Math.cos(t * TO_RADIANS);
-      var sinRY = Math.sin(t * TO_RADIANS);
-      var i = this.z,
-          o = this.y;
-      this.y = o * cosRY + i * sinRY;
-      this.z = o * -sinRY + i * cosRY
-  }
+  const texture = textureLoader.load(`./public/sprite/snow2.png`);
+  // 设置点材质纹理
+    pointsMaterial.map = texture;
+    pointsMaterial.alphaMap = texture;
+  const pointMesh = new THREE.Points( particlesGeometry, pointsMaterial );
+ 
+//5、加入场景搞定！
+scene.add(pointMesh);
 
-  velocity.rotateX(randomRange(-45, 45))
-  velocity.rotateX(randomRange(0, 360))
-  return velocity
-}
-
-// 动画
-function animate() {
-  let vertices = points.geometry.vertices;
-  vertices.forEach(function (v, idx) {
-    
-      // 计算位置
-      v.y = v.y + (v.velocity.y);
-      v.x = v.x + (v.velocity.x);
-      v.z = v.z + (v.velocity.z);
-
-      // 边界检查
-      if (v.y <= -range / 2) v.y = range / 2;
-      if (v.x <= -range / 2 || v.x >= range / 2) v.x = v.x * -1;
-      if (v.z <= -range / 2 || v.z >= range / 2) v.velocity.z = v.velocity.z * -1;
-  });
-
-  //重要：渲染时需要更新位置（如果没有设为true,则无法显示动画）
-  points.geometry.verticesNeedUpdate = true;
-  renderer.render(scene, camera);
-  requestAnimationFrame(animate);
-};
 
 
 
@@ -245,7 +194,7 @@ const rgbeloader = new RGBELoader();
     PlaneMesh.rotation.x = (-Math.PI / 2)
     PlaneMesh.receiveShadow = true
 
-    // scene.add(PlaneMesh);
+    scene.add(PlaneMesh);
  })
 
 
@@ -262,6 +211,7 @@ control.enableDamping = true;
 // 渲染动画
 function render() {
   control.update();
+  pointMesh.rotation.y -= 3*Math.pow(10,-3);
   camera.updateProjectionMatrix()
   renderer.render(scene, camera)
   requestAnimationFrame(render);
